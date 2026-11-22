@@ -1,0 +1,26 @@
+{
+  "seams": [["W1", "一号工位根部焊缝"], ["W2", "二号工位根部焊缝"], ["W3", "复核焊缝"]],
+  "scans": [
+    ["W1", "s1", "capture-s1", "raw-s1", 20],
+    ["W1", "s1-rescan", "capture-rescan", "raw-rescan", 20],
+    ["W2", "s2", "capture-s2", "raw-s2", 20],
+    ["W3", "test-9", "capture-9", "raw-9", 20],
+    ["W3", "test-2", "capture-2", "raw-2", 20],
+    [null, "pending", "capture-pending", "raw-pending", 40]
+  ],
+  "attribution": ["day-register", [["s1", "W1"], ["s1-rescan", "W1"], ["s2", "W2"], ["test-9", "W3"], ["test-2", "W3"]]],
+  "patches": [
+    ["crop", "crop-1", [["scan", "s1"]], "cropped", 20],
+    ["mosaic", "mosaic-1", [["patch", "crop-1"], ["scan", "s1-rescan"]], "mosaic", 20],
+    ["alternate", "alternate-1", [["scan", "s2"]], "alternate", 20]
+  ],
+  "checkout": ["day-A", [["patch", "mosaic-1"], ["definition", "mosaic-1"], ["patch", "alternate-1"]]],
+  "finishes": [["day-A", ["mosaic-1"]], ["day-B", ["alternate-1"]]],
+  "replacement": ["mosaic", "mosaic-2", [["scan", "s2"]], "new mosaic", 40],
+  "test_batch": "day-batch",
+  "training_ids": ["day-A", "day-B"],
+  "roster": [["t9", "test-9"], ["t2", "test-2"]],
+  "labels": [["t9", 0], ["t2", 1]],
+  "predictions": [["day-A", [["t9", [1, 3]], ["t2", [2, 3]]]], ["day-B", [["t2", [1, 4]], ["t9", [1, 2]]]]],
+  "cutoff": 20
+}

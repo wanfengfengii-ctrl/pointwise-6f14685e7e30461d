@@ -1,0 +1,12 @@
+BEGIN IMMEDIATE;
+INSERT INTO seams VALUES ('early-weld', '上一班留档焊缝');
+INSERT INTO payloads VALUES ('scan', 'early-scan', 12, X'6f6c642d726177');
+INSERT INTO payloads VALUES ('patch', 'early-r1', 12, X'6f6c642d63726f70');
+INSERT INTO scans VALUES ('early-scan', 'early-capture', 'early-weld');
+INSERT INTO attribution_revisions VALUES ('early-register');
+INSERT INTO scan_attributions VALUES ('early-register', 'early-scan', 'early-weld');
+INSERT INTO patch_revisions (revision_id, patch_id, expires_at) VALUES ('early-r1', 'early-patch', 12);
+INSERT INTO patch_parents VALUES ('early-r1', 0, 'scan', 'early-scan');
+INSERT INTO training_receipts VALUES ('early-run');
+INSERT INTO training_inputs VALUES ('early-run', 0, 'early-r1');
+COMMIT;
