@@ -2,6 +2,6 @@
   "version": 1,
   "kind": "cli",
   "setup": [],
-  "verify": ["python3", "-B", "check_project.py"],
-  "demo": ["python3", "-B", "shift_demo.py"]
+  "verify": ["python3", "-B", "verify_project.py"],
+  "demo": ["python3", "-B", "leakage_shift.py"]
 }

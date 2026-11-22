@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from retention.payloads import PayloadRef, store_payload
+from training.lineage import store_revision_evidence
 from training.parents import ParentRef, read_parent_refs, remove_parent_refs, store_parent_refs, validate_parents
 from weldbook import identifier, integer, read_snapshot, require_transaction, write_transaction
 
@@ -31,6 +32,7 @@ def revise_patch(db, patch_id, revision_id, parents, pixels, expires_at):
             (revision_id, patch_id, expires_at),
         )
         store_parent_refs(db, revision_id, refs)
+        store_revision_evidence(db, revision_id, refs)
     return PatchRevision(patch_id, revision_id, refs, payload, expires_at, False)
 
 

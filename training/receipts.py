@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from training.lineage import revision_scan_ancestry
 from weldbook import identifier, read_snapshot, require_transaction
 
 
@@ -27,3 +28,22 @@ def read_training_receipt(db, training_id):
             'SELECT revision_id FROM training_inputs WHERE training_id = ? ORDER BY position', (training_id,)
         ))
     return TrainingReceipt(training_id, revisions)
+
+
+def read_training_scans(db, training_id):
+    identifier(training_id, 'training id')
+    with read_snapshot(db):
+        if db.execute(
+            'SELECT 1 FROM training_receipts WHERE training_id = ?', (training_id,)
+        ).fetchone() is None:
+            raise KeyError(training_id)
+        revisions = tuple(row[0] for row in db.execute(
+            'SELECT revision_id FROM training_inputs WHERE training_id = ? ORDER BY position', (training_id,)
+        ))
+        scans = set()
+        for revision_id in revisions:
+            ancestry = revision_scan_ancestry(db, revision_id)
+            if ancestry is None:
+                return None
+            scans.update(ancestry)
+    return tuple(sorted(scans))

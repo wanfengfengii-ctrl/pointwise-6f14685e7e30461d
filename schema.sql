@@ -72,6 +72,13 @@ CREATE TABLE IF NOT EXISTS training_inputs (
     PRIMARY KEY (training_id, position),
     UNIQUE (training_id, revision_id)
 );
+CREATE TABLE IF NOT EXISTS revision_parent_evidence (
+    revision_id TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('scan', 'patch')),
+    parent_key TEXT NOT NULL,
+    PRIMARY KEY (revision_id, position)
+);
 CREATE TABLE IF NOT EXISTS frozen_batches (
     batch_id TEXT PRIMARY KEY NOT NULL,
     first_training TEXT NOT NULL REFERENCES training_receipts(training_id),
@@ -142,6 +149,45 @@ CREATE TABLE IF NOT EXISTS retirement_receipts (
     target_key TEXT NOT NULL,
     cutoff INTEGER NOT NULL,
     PRIMARY KEY (kind, target_key)
+);
+CREATE TABLE IF NOT EXISTS clean_reports (
+    report_id INTEGER PRIMARY KEY,
+    batch_id TEXT NOT NULL REFERENCES frozen_batches(batch_id),
+    first_training TEXT NOT NULL REFERENCES training_receipts(training_id),
+    second_training TEXT NOT NULL REFERENCES training_receipts(training_id),
+    attribution_id TEXT NOT NULL REFERENCES attribution_revisions(revision_id),
+    mean_difference TEXT,
+    CHECK (first_training <> second_training)
+);
+CREATE TABLE IF NOT EXISTS clean_report_pieces (
+    report_id INTEGER NOT NULL REFERENCES clean_reports(report_id),
+    position INTEGER NOT NULL,
+    piece_id TEXT NOT NULL,
+    scan_id TEXT NOT NULL,
+    seam_id TEXT NOT NULL,
+    included INTEGER NOT NULL CHECK (included IN (0, 1)),
+    first_p TEXT NOT NULL,
+    second_p TEXT NOT NULL,
+    difference TEXT,
+    PRIMARY KEY (report_id, position)
+);
+CREATE TABLE IF NOT EXISTS clean_report_matches (
+    report_id INTEGER NOT NULL REFERENCES clean_reports(report_id),
+    position INTEGER NOT NULL,
+    model_position INTEGER NOT NULL CHECK (model_position IN (0, 1)),
+    training_id TEXT NOT NULL,
+    PRIMARY KEY (report_id, position, model_position)
+);
+CREATE TABLE IF NOT EXISTS clean_report_scans (
+    report_id INTEGER NOT NULL REFERENCES clean_reports(report_id),
+    model_position INTEGER NOT NULL CHECK (model_position IN (0, 1)),
+    scan_position INTEGER NOT NULL,
+    scan_id TEXT NOT NULL,
+    PRIMARY KEY (report_id, model_position, scan_position)
+);
+CREATE TABLE IF NOT EXISTS clean_report_receipts (
+    report_id INTEGER PRIMARY KEY REFERENCES clean_reports(report_id),
+    receipt_id TEXT NOT NULL UNIQUE
 );
 
 COMMIT;
